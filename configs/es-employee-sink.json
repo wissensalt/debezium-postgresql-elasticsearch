@@ -14,10 +14,13 @@
     "value.converter.schemas.enable": "false",
     "schema.ignore": "true",
     "key.ignore": "false",
+    "behavior.on.null.values": "delete",    
 
     "transforms": "unwrap,key",
     "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
     "transforms.key.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
-    "transforms.key.field": "id"
+    "transforms.key.field": "id",
+    "transforms.unwrap.drop.tombstones": "false",
+    "transforms.unwrap.drop.deletes": "false"
   }
 }
