@@ -1,0 +1,35 @@
+{
+  "name": "postgres-employee-source",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "plugin.name": "pgoutput",
+
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "pgadmin",
+    "database.dbname": "employee_db",
+    "schema.include.list": "public",
+    "include.schema.changes": "true",
+    "database.server.name": "postgre-employee",
+    "database.server.id": "5401",
+
+    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.kafka.topic": "public.history",
+
+    "key.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "key.converter.schema.registry.url": "http://schema-registry:8081",
+    "value.converter.schema.registry.url": "http://schema-registry:8081",
+    "key.converter.schemas.enable": "false",
+    "value.converter.schemas.enable": "false",
+
+    "transforms":"Reroute",
+    "transforms.Reroute.type": "io.debezium.transforms.ByLogicalTableRouter",
+    "transforms.Reroute.topic.regex":"(.*)employee",
+    "transforms.Reroute.topic.replacement": "cdc.employee_db.public.employee",
+    "transforms.Reroute.key.field.name": "id",
+    "transforms.Reroute.key.enforce.uniqueness":"false"
+  }
+}

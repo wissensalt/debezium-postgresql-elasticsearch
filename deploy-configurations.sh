@@ -7,4 +7,4 @@ curl -i -X PUT -H "Accept:application/json" -H  "Content-Type:application/json" 
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @configs/es-employee-sink.json
 
 # setup connector
-curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @configs/debezium-employee-connector.json
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @configs/postgres-employee-source.json

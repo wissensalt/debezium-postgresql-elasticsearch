@@ -54,3 +54,28 @@ docker-compose down
 - https://debezium.io/documentation/reference/stable/connectors/mysql.html
 - https://debezium.io/documentation/reference/connectors/postgresql.html
 - https://docs.confluent.io/debezium-connect-mysql-source/current/mysql_source_connector_config.html
+
+
+ 
+docker run -p 8080:8080 --network=debezium-postgresql-elasticsearch_default --link elasticsearch -d cars10/elasticvue
+
+"transforms": "unwrap,key",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "false",
+    "transforms.unwrap.drop.deletes": "false",
+    "transforms.key.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.key.field": "id",
+    "behavior.on.null.values": "delete",
+    
+docker run -it --rm --name avro-consumer --network=debezium-postgresql-elasticsearch_default \
+    --link cdc_zookeeper \
+    --link cdc_kafka \
+    --link cdc_postgres \
+    --link cdc_schema_registry \
+    debezium/connect:0.10 \
+    /kafka/bin/kafka-console-consumer.sh \
+      --bootstrap-server kafka:9092 \
+      --property print.key=true \
+      --formatter io.confluent.kafka.formatter.AvroMessageFormatter \
+      --property schema.registry.url=http://schema-registry:8081 \
+      --topic postgre-employee.public.employee

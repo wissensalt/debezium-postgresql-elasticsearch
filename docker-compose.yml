@@ -31,6 +31,23 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=pgadmin
 
+  schema_registry:
+    image: confluentinc/cp-schema-registry
+    container_name: cdc_schema_registry
+    hostname: schema-registry
+    restart: always
+    depends_on:
+      - zookeeper
+      - kafka
+    ports:
+      - 8181:8181
+      - 8081:8081
+    environment:
+      - SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL=zookeeper:2181
+      - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+      - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081
+      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=//kafka:9092
+
   connect:
     container_name: cdc_connect
     build:
@@ -49,10 +66,16 @@ services:
       - CONFIG_STORAGE_TOPIC=my_connect_configs
       - OFFSET_STORAGE_TOPIC=my_connect_offsets
       - STATUS_STORAGE_TOPIC=my_connect_statuses
+      - KEY_CONVERTER=io.confluent.connect.avro.AvroConverter
+      - VALUE_CONVERTER=io.confluent.connect.avro.AvroConverter
+      - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
+      - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
+      - INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
 
   elasticsearch:
     container_name: cdc_elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.22
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.0.0
     restart: always
     ports:
       - "9200:9200"
@@ -62,3 +85,5 @@ services:
       - xpack.security.enabled=false
       - "discovery.type=single-node"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - http.cors.enabled=true
+      - http.cors.allow-origin="http://localhost:8080"

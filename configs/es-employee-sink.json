@@ -1,18 +1,23 @@
 {
-  "name": "elasticsearch-employee_db-connector",
+  "name": "es-employee-sink",
   "config": {
     "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
     "tasks.max": "1",
-    "topics": "postgre-debezium-server.public.employee",
+    "topics": "cdc.employee_db.public.employee",
     "connection.url": "http://elasticsearch:9200",
+
+    "type.name": "_doc",
+    "key.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "key.converter.schema.registry.url": "http://schema-registry:8081",
+    "value.converter.schema.registry.url": "http://schema-registry:8081",
+    "value.converter.schemas.enable": "false",
+    "schema.ignore": "true",
+    "key.ignore": "false",
+
     "transforms": "unwrap,key",
     "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
-    "transforms.unwrap.drop.tombstones": "false",
-    "transforms.unwrap.drop.deletes": "false",
     "transforms.key.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
-    "transforms.key.field": "id",
-    "key.ignore": "false",
-    "type.name": "_doc",
-    "behavior.on.null.values": "delete"
+    "transforms.key.field": "id"
   }
 }
