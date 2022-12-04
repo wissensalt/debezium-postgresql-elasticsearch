@@ -14,6 +14,9 @@
 
 ## How to Run
 ```sh
+# load environment variables
+source .env
+
 # Run all docker instances
 docker-compose up
 ```
